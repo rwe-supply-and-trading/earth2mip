@@ -224,7 +224,7 @@ def get(
         data[i] = field
 
     # Clean up
-    shutil.rmtree(GFS_CACHE)
+    # shutil.rmtree(GFS_CACHE)
 
     return data
 

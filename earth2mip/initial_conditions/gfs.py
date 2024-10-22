@@ -180,6 +180,7 @@ def get_gfs_grib_file(
 def get(
     time: Union[datetime.datetime, None],
     gfs_channels: List[str],
+    download_gfs: bool,
 ) -> np.ndarray:
     # If no time is provided, use current time
     if time is None:
@@ -198,15 +199,18 @@ def get(
             + "(needs to be past 10 days)"
         )
 
-    # Make temp grib folder
-    pathlib.Path(GFS_CACHE).mkdir(parents=True, exist_ok=True)
-    # Get index file
-    gfs_chunks = get_gfs_chunks(time_gfs)
+    if download_gfs:
+        # Make temp grib folder
+        pathlib.Path(GFS_CACHE).mkdir(parents=True, exist_ok=True)
+        # Get index file
+        gfs_chunks = get_gfs_chunks(time_gfs)
 
-    # Loop through channels and download grib of each
-    logger.info(f"Downloading {len(gfs_channels)} grib files:")
-    for idname in tqdm(gfs_channels):
-        get_gfs_grib_file(time_gfs, gfs_chunks, idname, f"{GFS_CACHE}/{idname}.grb")
+        # Loop through channels and download grib of each
+        logger.info(f"Downloading {len(gfs_channels)} grib files:")
+        for idname in tqdm(gfs_channels):
+            get_gfs_grib_file(time_gfs, gfs_chunks, idname, f"{GFS_CACHE}/{idname}.grb")
+    else: 
+        logger.info(f"GFS initial conditions already present, skipping download")
 
     # Convert gribs to xarray dataset
     data = np.empty((len(gfs_channels), 721, 1440))
@@ -419,10 +423,11 @@ def _get_gfs_name_dict() -> Dict[str, str]:
 
 
 class DataSource(base.DataSource):
-    def __init__(self, channels: List[str]) -> None:
+    def __init__(self, channels: List[str], download_ic=True) -> None:
         lookup = _get_gfs_name_dict()
         self._gfs_channels = [lookup[c] for c in channels]
         self._channel_names = channels
+        self._download_gfs = download_ic
 
     @property
     def grid(self) -> earth2mip.grid.LatLonGrid:
@@ -433,4 +438,4 @@ class DataSource(base.DataSource):
         return self._channel_names
 
     def __getitem__(self, time: datetime.datetime) -> np.ndarray:
-        return get(time, self._gfs_channels)
+        return get(time, self._gfs_channels, self._download_gfs)

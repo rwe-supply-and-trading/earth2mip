@@ -228,7 +228,10 @@ def get(
         data[i] = field
 
     # Clean up
-    # shutil.rmtree(GFS_CACHE)
+    if download_gfs:
+        shutil.rmtree(GFS_CACHE)
+    else:
+        logger.info(f"Retaining GFS initial conditions in {GFS_CACHE}")
 
     return data
 

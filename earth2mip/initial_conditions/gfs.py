@@ -426,7 +426,7 @@ def _get_gfs_name_dict() -> Dict[str, str]:
 
 
 class DataSource(base.DataSource):
-    def __init__(self, channels: List[str], download_ic=True) -> None:
+    def __init__(self, channels: List[str], download_ic: bool = True) -> None:
         lookup = _get_gfs_name_dict()
         self._gfs_channels = [lookup[c] for c in channels]
         self._channel_names = channels

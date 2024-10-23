@@ -230,6 +230,7 @@ def get(
     # Clean up
     if download_gfs:
         shutil.rmtree(GFS_CACHE)
+	logger.info(f"Removing GFS initial conditions in {GFS_CACHE}")
     else:
         logger.info(f"Retaining GFS initial conditions in {GFS_CACHE}")
 

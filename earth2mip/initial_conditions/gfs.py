@@ -210,14 +210,14 @@ def get(
         for idname in tqdm(gfs_channels):
             get_gfs_grib_file(time_gfs, gfs_chunks, idname, f"{GFS_CACHE}/{idname}.grb")
     else:
-	# ensure that cache folder exists
-	if not pathlib.Path(GFS_CACHE).exists():
-		raise NotADirectoryError(f"Directory {GFS_CACHE} does not exist.")
-	# check that all necessary files are present 
-	for idname in tqdm(gfs_channels):
-		filepath = pathlib.Path(f"{GFS_CACHE}/{idname}.grb")
-		if not filepath.is_file():
-			raise FileNotFoundError(f"Required IC file {filepath} is missing from {GFS_CACHE}")
+	    # ensure that cache folder exists
+        if not pathlib.Path(GFS_CACHE).exists():
+            raise NotADirectoryError(f"Directory {GFS_CACHE} does not exist.")
+        # check that all necessary files are present 
+        for idname in tqdm(gfs_channels):
+            filepath = pathlib.Path(f"{GFS_CACHE}/{idname}.grb")
+            if not filepath.is_file():
+                raise FileNotFoundError(f"Required IC file {filepath} is missing from {GFS_CACHE}")
         logger.info(f"GFS initial conditions already present, skipping download")
 
     # Convert gribs to xarray dataset
@@ -238,7 +238,7 @@ def get(
     # Clean up
     if download_gfs:
         shutil.rmtree(GFS_CACHE)
-	logger.info(f"Removing GFS initial conditions in {GFS_CACHE}")
+        logger.info(f"Removing GFS initial conditions in {GFS_CACHE}")
     else:
         logger.info(f"Retaining GFS initial conditions in {GFS_CACHE}")
 

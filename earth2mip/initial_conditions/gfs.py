@@ -215,7 +215,7 @@ def get(
 		raise NotADirectoryError(f"Directory {GFS_CACHE} does not exist.")
 	# check that all necessary files are present 
 	for idname in tqdm(gfs_channels):
-		filepath = Path(f"{GFS_CACHE}/{idname}.grb")
+		filepath = pathlib.Path(f"{GFS_CACHE}/{idname}.grb")
 		if not filepath.is_file():
 			raise FileNotFoundError(f"Required IC file {filepath} is missing from {GFS_CACHE}")
         logger.info(f"GFS initial conditions already present, skipping download")

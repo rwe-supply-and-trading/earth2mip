@@ -53,7 +53,7 @@ def _get_channel(c: str, **kwargs) -> xarray.DataArray:
         return kwargs[varcode].interp(isobaricInhPa=pressure_level)
 
 
-def get(time: datetime.datetime, channels: List[str]):
+def get(time: datetime.datetime, channels: List[str], ensemble_member: int):
     # this data product is outdated (as of 10/2024) and no longer exists
     # also it is no longer necessary to get these data files separately
     # either update to GCS or completely rely on local files
@@ -147,8 +147,9 @@ def get(time: datetime.datetime, channels: List[str]):
 
 @dataclasses.dataclass
 class DataSource(base.DataSource):
-    def __init__(self, channel_names: List[str]):
+    def __init__(self, channel_names: List[str], ensemble_member: int = 1):
         self._channel_names = channel_names
+        self._ensemble_member = ensemble_member
 
     @property
     def channel_names(self) -> List[str]:
@@ -159,7 +160,7 @@ class DataSource(base.DataSource):
         return earth2mip.grid.equiangular_lat_lon_grid(721, 1440)
 
     def __getitem__(self, time: datetime.datetime) -> np.ndarray:
-        ds = get(time, self.channel_names)
+        ds = get(time, self.channel_names, self.ensemble_member)
         # ds = ds.expand_dims("time", axis=0)
         # move to earth2mip.channels
 

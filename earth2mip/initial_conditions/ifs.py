@@ -72,7 +72,7 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int):
     dataset_0h = cfgrib.open_datasets(path)
 
     ## TO-DO add as argument
-    ensemble_member = 2
+    # ensemble_member = 2
 
     # print(dataset_0h)
     print([ds['u10'] for ds in dataset_0h if 'u10' in ds.data_vars][0])
@@ -154,6 +154,10 @@ class DataSource(base.DataSource):
     @property
     def channel_names(self) -> List[str]:
         return self._channel_names
+
+    @property
+    def ensemble_member(self) -> int:
+        return self._ensemble_member
 
     @property
     def grid(self) -> earth2mip.grid.LatLonGrid:

@@ -45,11 +45,9 @@ def _get_channel(c: str, **kwargs) -> xarray.DataArray:
     """
     # handle 2d inputs
     if c in kwargs:
-        print("returning {} in kwargs".format(c))
         return kwargs[c]
     else:
         varcode, pressure_level = c[0], int(c[1:])
-        print("providing {} andd {}".format(varcode, pressure_level))
         return kwargs[varcode].interp(isobaricInhPa=pressure_level)
 
 
@@ -71,19 +69,10 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int):
     #dataset_0h = xarray.open_dataset(path, filter_by_keys={'dataType': 'pf', 'typeOfLevel': 'heightAboveGround', 'level': 2}, engine="cfgrib")
     dataset_0h = cfgrib.open_datasets(path)
 
-    ## TO-DO add as argument
-    # ensemble_member = 2
-
-    # print(dataset_0h)
-    print([ds['u10'] for ds in dataset_0h if 'u10' in ds.data_vars][0])
-    print([ds['u10'] for ds in dataset_0h if 'u10' in ds.data_vars][0].sel(number=ensemble_member))
-    # print(dataset_0h.data_vars)
     # get t2m and other things from 12 hour forecast initialized 12 hours before
     # The HRES is only initialized every 12 hours
     #path = root + _get_filename(time - datetime.timedelta(hours=12), "12h")
-    #print("second filepath is {}".format(path))
     #local_path = filesystem._download_cached(path)
-    #forecast_12h = xarray.open_dataset(local_path, engine="cfgrib")
 
     channel_data = [
         _get_channel(

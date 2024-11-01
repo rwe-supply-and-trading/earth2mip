@@ -65,46 +65,37 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int):
     path = root + filename
     print("path is {}".format(path))
     # local_path = filesystem._download_cached(path)
-    # dataset_0h = xarray.open_dataset(local_path, engine="cfgrib")
-    #dataset_0h = xarray.open_dataset(path, filter_by_keys={'dataType': 'pf', 'typeOfLevel': 'heightAboveGround', 'level': 2}, engine="cfgrib")
+    # open as list of Datasets given structure of grib 
     dataset_0h = cfgrib.open_datasets(path)
 
+    # try to get control forecast
+    # dataset_cf = cfgrib.open_datasets(path, filter_by_keys={'type': 'cf', 'shortName': 'cf', 'indexpath': ''})
+    # dataset_cf = xarray.open_datasets(path, engine='cfgrib', backend_kwargs={'filter_by_keys': {'type': 'cf'}})
+    dataset_cf = [ds for ds in dataset_0h if 0 in ds['number']]
     # get t2m and other things from 12 hour forecast initialized 12 hours before
     # The HRES is only initialized every 12 hours
     #path = root + _get_filename(time - datetime.timedelta(hours=12), "12h")
     #local_path = filesystem._download_cached(path)
 
+    print("trying to find control forecast")
+    # print([ds['u10'] for ds in dataset_0h if ('u10' in ds.data_vars) & (ds.dims.type == 'cf')][0])
+    print(dataset_cf)
+
     channel_data = [
         _get_channel(
             c,
-            #u10m=dataset_0h.u10,
             u10m=[ds['u10'] for ds in dataset_0h if 'u10' in ds.data_vars][0].sel(number=ensemble_member),
-            #v10m=dataset_0h.v10,
             v10m=[ds['v10'] for ds in dataset_0h if 'v10' in ds.data_vars][0].sel(number=ensemble_member),
-            # u100m=dataset_0h.u10,
             u100m=[ds['u100'] for ds in dataset_0h if 'u100' in ds.data_vars][0].sel(number=ensemble_member),
-            #v100m=dataset_0h.v10,
             v100m=[ds['v100'] for ds in dataset_0h if 'v100' in ds.data_vars][0].sel(number=ensemble_member),
-            #sp=dataset_0h.sp,
             sp=[ds['sp']  for ds in dataset_0h if 'sp' in ds.data_vars][0].sel(number=ensemble_member),
-            # t2m=forecast_12h.t2m,
-            #t2m=dataset_0h.t2m,
             t2m=[ds['t2m'] for ds in dataset_0h if 't2m' in ds.data_vars][0].sel(number=ensemble_member),
-            #msl=forecast_12h.msl,
-            #msl=dataset_0h.msl,
             msl=[ds['msl'] for ds in dataset_0h if 'msl' in ds.data_vars][0].sel(number=ensemble_member),
-            # tcwv=forecast_12h.tciwv,
-            #tcwv=dataset_0h.tciwv,
             tcwv=[ds['tcwv'] for ds in dataset_0h if 'tcwv' in ds.data_vars][0].sel(number=ensemble_member),
-            #t=dataset_0h.t,
             t=[ds['t'] for ds in dataset_0h if 't' in ds.data_vars][0].sel(number=ensemble_member),
-            #u=dataset_0h.u,
             u=[ds['u'] for ds in dataset_0h if 'u' in ds.data_vars][0].sel(number=ensemble_member),
-            #v=dataset_0h.v,
             v=[ds['v'] for ds in dataset_0h if 'v' in ds.data_vars][0].sel(number=ensemble_member),
-            #r=dataset_0h.r,
             r=[ds['r'] for ds in dataset_0h if 'r' in ds.data_vars][0].sel(number=ensemble_member),
-            #z=dataset_0h.gh * 9.81,
             z=[ds['gh'] for ds in dataset_0h if 'gh' in ds.data_vars][0].sel(number=ensemble_member) * 9.81,
         )
         for c in channels

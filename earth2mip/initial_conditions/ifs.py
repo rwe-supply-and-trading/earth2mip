@@ -52,10 +52,6 @@ def _get_channel(c: str, **kwargs) -> xarray.DataArray:
 
 
 def get(time: datetime.datetime, channels: List[str], ensemble_member: int):
-    # this data product is outdated (as of 10/2024) and no longer exists
-    # also it is no longer necessary to get these data files separately
-    # either update to GCS or completely rely on local files
-    # root = "https://ecmwf-forecasts.s3.eu-central-1.amazonaws.com/"
     root = "/dev/shm/"
     # oper for testing
     # filename = "20241020120000-0h-oper-fc.grib2"
@@ -64,17 +60,12 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int):
     #path = root + _get_filename(time, "0h")
     path = root + filename
     print("path is {}".format(path))
-    # local_path = filesystem._download_cached(path)
     # open as list of Datasets given structure of grib 
     dataset_0h = cfgrib.open_datasets(path)
 
-    # try to get control forecast
-    # dataset_cf = cfgrib.open_datasets(path, filter_by_keys={'type': 'cf', 'shortName': 'cf', 'indexpath': ''})
-    # dataset_cf = xarray.open_datasets(path, engine='cfgrib', backend_kwargs={'filter_by_keys': {'type': 'cf'}})
+    # split control forecast and perturbed forecasts 
     dataset_pf = [ds for ds in dataset_0h if 0 not in ds['number']]
     dataset_cf = [ds for ds in dataset_0h if 0 in ds['number']]
-    # get t2m and other things from 12 hour forecast initialized 12 hours before
-    # The HRES is only initialized every 12 hours
     #path = root + _get_filename(time - datetime.timedelta(hours=12), "12h")
     #local_path = filesystem._download_cached(path)
 
@@ -159,17 +150,13 @@ class DataSource(base.DataSource):
 
     def __getitem__(self, time: datetime.datetime) -> np.ndarray:
         ds = get(time, self.channel_names, self.ensemble_member)
-        # ds = ds.expand_dims("time", axis=0)
-        # move to earth2mip.channels
 
-        # TODO refactor interpolation to another place
+        # move to earth2mip.channels
         metadata = json.loads(METADATA.read_text())
         lat = np.array(metadata["coords"]["lat"])
         lon = np.array(metadata["coords"]["lon"])
         ds = ds.roll(lon=len(ds.lon) // 2, roll_coords=True)
-        print("rolled longitudes") 
         ds["lon"] = ds.lon.where(ds.lon >= 0, ds.lon + 360)
-        print("reassigned rolled longitudes")
         assert min(ds.lon) >= 0, min(ds.lon)  # noqa
         # return ds.interp(lat=lat, lon=lon, kwargs={"fill_value": "extrapolate"})
         return ds

@@ -71,15 +71,12 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int):
     # try to get control forecast
     # dataset_cf = cfgrib.open_datasets(path, filter_by_keys={'type': 'cf', 'shortName': 'cf', 'indexpath': ''})
     # dataset_cf = xarray.open_datasets(path, engine='cfgrib', backend_kwargs={'filter_by_keys': {'type': 'cf'}})
+    dataset_pf = [ds for ds in dataset_0h if 0 not in ds['number']]
     dataset_cf = [ds for ds in dataset_0h if 0 in ds['number']]
     # get t2m and other things from 12 hour forecast initialized 12 hours before
     # The HRES is only initialized every 12 hours
     #path = root + _get_filename(time - datetime.timedelta(hours=12), "12h")
     #local_path = filesystem._download_cached(path)
-
-    print("trying to find control forecast")
-    # print([ds['u10'] for ds in dataset_0h if ('u10' in ds.data_vars) & (ds.dims.type == 'cf')][0])
-    print(dataset_cf)
 
     channel_data = [
         _get_channel(

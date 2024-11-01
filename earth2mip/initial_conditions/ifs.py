@@ -30,9 +30,8 @@ from earth2mip.initial_conditions import base
 
 
 def _get_filename(time: datetime.datetime, lead_time: str):
-    # date_format = f"%Y%m%d/%Hz/0p4-beta/oper/%Y%m%d%H%M%S-{lead_time}-oper-fc.grib2"
-    date_format = f"%Y%m%d/%Hz/ifs/0p4-beta/oper/%Y%m%d%H%M%S-{lead_time}-oper-fc.grib2"
-    return time.strftime(date_format)
+    file_format = f"%Y%m%d%H0000-{lead_time}-enfo-ef.grib2"
+    return time.strftime(file_format)
 
 
 def _get_channel(c: str, **kwargs) -> xarray.DataArray:
@@ -51,23 +50,15 @@ def _get_channel(c: str, **kwargs) -> xarray.DataArray:
         return kwargs[varcode].interp(isobaricInhPa=pressure_level)
 
 
-def get(time: datetime.datetime, channels: List[str], ensemble_member: int):
-    root = "/dev/shm/"
-    # oper for testing
-    # filename = "20241020120000-0h-oper-fc.grib2"
-    # ifs ensemble 
-    filename = "20241020120000-0h-enfo-ef.grib2"
-    #path = root + _get_filename(time, "0h")
-    path = root + filename
-    print("path is {}".format(path))
+def get(time: datetime.datetime, channels: List[str], ensemble_member: int, 
+        root_path: str):
+    path = root_path + _get_filename(time, "0h")
     # open as list of Datasets given structure of grib 
     dataset_0h = cfgrib.open_datasets(path)
 
     # split control forecast and perturbed forecasts 
     dataset_pf = [ds for ds in dataset_0h if 0 not in ds['number']]
     dataset_cf = [ds for ds in dataset_0h if 0 in ds['number']]
-    #path = root + _get_filename(time - datetime.timedelta(hours=12), "12h")
-    #local_path = filesystem._download_cached(path)
 
     if ensemble_member == 0:
         channel_data = [
@@ -132,9 +123,10 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int):
 
 @dataclasses.dataclass
 class DataSource(base.DataSource):
-    def __init__(self, channel_names: List[str], ensemble_member: int = 1):
+    def __init__(self, channel_names: List[str], from_path: str, ensemble_member: int = 1):
         self._channel_names = channel_names
         self._ensemble_member = ensemble_member
+        self._root_path = from_path
 
     @property
     def channel_names(self) -> List[str]:
@@ -145,11 +137,16 @@ class DataSource(base.DataSource):
         return self._ensemble_member
 
     @property
+    def root_path(self) -> str:
+        return self._root_path
+
+    @property
     def grid(self) -> earth2mip.grid.LatLonGrid:
         return earth2mip.grid.equiangular_lat_lon_grid(721, 1440)
 
     def __getitem__(self, time: datetime.datetime) -> np.ndarray:
-        ds = get(time, self.channel_names, self.ensemble_member)
+        ds = get(time, self.channel_names, self.ensemble_member, 
+                self.root_path)
 
         # move to earth2mip.channels
         metadata = json.loads(METADATA.read_text())
@@ -158,5 +155,4 @@ class DataSource(base.DataSource):
         ds = ds.roll(lon=len(ds.lon) // 2, roll_coords=True)
         ds["lon"] = ds.lon.where(ds.lon >= 0, ds.lon + 360)
         assert min(ds.lon) >= 0, min(ds.lon)  # noqa
-        # return ds.interp(lat=lat, lon=lon, kwargs={"fill_value": "extrapolate"})
         return ds

@@ -120,26 +120,22 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int):
         ]
 
     # dataset_0h is list of Datasets, grab first one 
-    # for creating new array
+    # for creating new array, variable doesn't matter 
     ds_ex = dataset_0h[0]
 
     array = np.stack([d for d in channel_data], axis=0)
-    print("shape of array is {}".format(array.shape))
+    
     darray = xarray.DataArray(
         array,
         dims=["channel", "lat", "lon"],
-        # dims=["channel", "ensemble_member", "lat", "lon"],
         coords={
             "channel": channels,
-            # "ensemble_member": ds_ex.number.values,
-            # "lon": dataset_0h.longitude.values,
             "lon": ds_ex.longitude.values,
-            #"lat": dataset_0h.latitude.values,
             "lat": ds_ex.latitude.values,
             "time": time,
         },
     )
-    print("created array")
+    
     return darray
 
 

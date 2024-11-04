@@ -123,7 +123,7 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
 
 @dataclasses.dataclass
 class DataSource(base.DataSource):
-    def __init__(self, channel_names: List[str], from_path: str, ensemble_member: int = 1):
+    def __init__(self, channel_names: List[str], from_path: str, ensemble_member: int = 0):
         self._channel_names = channel_names
         self._ensemble_member = ensemble_member
         self._root_path = from_path

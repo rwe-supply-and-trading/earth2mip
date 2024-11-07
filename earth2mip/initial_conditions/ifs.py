@@ -29,7 +29,10 @@ from earth2mip.datasets.era5 import METADATA
 from earth2mip.initial_conditions import base
 
 
-def _get_filename(time: datetime.datetime, lead_time: str):
+def _get_filename(time: datetime.datetime, lead_time: str): -> str:
+    """
+    Returns the IFS forecast grib file given the specified datetime and lead time.
+    """
     file_format = f"%Y%m%d%H0000-{lead_time}-enfo-ef.grib2"
     return time.strftime(file_format)
 

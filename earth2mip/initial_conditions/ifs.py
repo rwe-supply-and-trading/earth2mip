@@ -51,7 +51,7 @@ def _get_channel(c: str, **kwargs) -> xarray.DataArray:
 
 
 def get(time: datetime.datetime, channels: List[str], ensemble_member: int, 
-        root_path: str):
+        root_path: str): -> xarray.DataArray:
     path = root_path + _get_filename(time, "0h")
     # open as list of Datasets given structure of grib 
     dataset_0h = cfgrib.open_datasets(path)

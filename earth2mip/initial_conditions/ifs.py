@@ -31,7 +31,10 @@ from earth2mip.initial_conditions import base
 
 def _get_filename(time: datetime.datetime, lead_time: str): -> str:
     """
-    Returns the IFS forecast grib file given the specified datetime and lead time.
+    Returns the IFS forecast grib file containing control and perturbed forecasts
+    given the specified datetime and lead time.
+    Note that the filename format is specific to the ECMWF IFS forecasts,
+    and may need to be adjusted for future versions.
     """
     file_format = f"%Y%m%d%H0000-{lead_time}-enfo-ef.grib2"
     return time.strftime(file_format)

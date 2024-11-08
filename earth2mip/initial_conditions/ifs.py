@@ -57,7 +57,7 @@ def _get_channel(c: str, **kwargs) -> xarray.DataArray:
 
 
 def get(time: datetime.datetime, channels: List[str], ensemble_member: int, 
-        root_path: str) -> xarray.DataArray:
+        root_path: str, hens: bool) -> xarray.DataArray:
     path = os.path.join(root_path, _get_filename(time, "0h"))
     # open as list of Datasets given structure of grib 
     dataset_0h = cfgrib.open_datasets(path)
@@ -75,6 +75,9 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
 
     # channel variables that do not require renaming
     channel_vars = ['sp', 't2m', 'msl', 'tcwv', 't', 'u', 'v', 'r']
+
+    if hens:
+        channel_vars = channel_vars.append('2d')
     
     channel_data = [
         _get_channel(
@@ -111,14 +114,21 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
 
 @dataclasses.dataclass
 class DataSource(base.DataSource):
-    def __init__(self, channel_names: List[str], from_path: str, ensemble_member: int = 0):
+    def __init__(self, channel_names: List[str], from_path: str, ensemble_member: int = 0, hens: bool = False):
         self._channel_names = channel_names
         self._ensemble_member = ensemble_member
         self._root_path = from_path
+        self._hens = hens
 
     @property
     def channel_names(self) -> List[str]:
         return self._channel_names
+
+    @property
+    def hens(self) -> bool:
+        # boolean flag that includes dewpoint temperature (2d) if set to True
+        # note that SFNO version that has dewpoint temperature as input channel must be used
+        return self._hens
 
     @property
     def ensemble_member(self) -> int:
@@ -134,7 +144,7 @@ class DataSource(base.DataSource):
 
     def __getitem__(self, time: datetime.datetime) -> np.ndarray:
         ds = get(time, self.channel_names, self.ensemble_member, 
-                self.root_path)
+                self.root_path, self.hens)
 
         # move to earth2mip.channels
         metadata = json.loads(METADATA.read_text())

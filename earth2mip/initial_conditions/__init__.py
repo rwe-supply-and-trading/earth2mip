@@ -94,12 +94,14 @@ def get_data_from_source(
 
     index = [data_source.channel_names.index(c) for c in channel_names]
     values = np.take(array, index, axis=1)
-    regridder = regrid.get_regridder(data_source.grid, grid).to(device)
+    # TO-DO: don't regrid if IC resolution already same as model resolution
+    # regridder = regrid.get_regridder(data_source.grid, grid).to(device)
     x = torch.from_numpy(values).to(device).type(dtype)
     # need a batch dimension of length 1
     # make an empty batch dim
     x = x[None]
-    x = regridder(x)
+    # TO-DO: make below statement conditional on differing resolutions 
+    # x = regridder(x)
     return x
 
 

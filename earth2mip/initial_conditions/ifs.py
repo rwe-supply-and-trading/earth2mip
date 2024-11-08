@@ -66,49 +66,6 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
     dataset_pf = [ds for ds in dataset_0h if 0 not in ds['number']]
     dataset_cf = [ds for ds in dataset_0h if 0 in ds['number']]
 
-    """
-    if ensemble_member == 0:
-        channel_data = [
-            _get_channel(
-                c,
-                u10m=[ds['u10'] for ds in dataset_cf if 'u10' in ds.data_vars][0],
-                v10m=[ds['v10'] for ds in dataset_cf if 'v10' in ds.data_vars][0],
-                u100m=[ds['u100'] for ds in dataset_cf if 'u100' in ds.data_vars][0],
-                v100m=[ds['v100'] for ds in dataset_cf if 'v100' in ds.data_vars][0],
-                sp=[ds['sp']  for ds in dataset_cf if 'sp' in ds.data_vars][0],
-                t2m=[ds['t2m'] for ds in dataset_cf if 't2m' in ds.data_vars][0],
-                msl=[ds['msl'] for ds in dataset_cf if 'msl' in ds.data_vars][0],
-                tcwv=[ds['tcwv'] for ds in dataset_cf if 'tcwv' in ds.data_vars][0],
-                t=[ds['t'] for ds in dataset_cf if 't' in ds.data_vars][0],
-                u=[ds['u'] for ds in dataset_cf if 'u' in ds.data_vars][0],
-                v=[ds['v'] for ds in dataset_cf if 'v' in ds.data_vars][0],
-                r=[ds['r'] for ds in dataset_cf if 'r' in ds.data_vars][0],
-                z=[ds['gh'] for ds in dataset_cf if 'gh' in ds.data_vars][0] * 9.81,
-            )
-            for c in channels
-        ]
-    else: 
-        channel_data = [
-            _get_channel(
-                c,
-                u10m=[ds['u10'] for ds in dataset_pf if 'u10' in ds.data_vars][0].sel(number=ensemble_member),
-                v10m=[ds['v10'] for ds in dataset_pf if 'v10' in ds.data_vars][0].sel(number=ensemble_member),
-                u100m=[ds['u100'] for ds in dataset_pf if 'u100' in ds.data_vars][0].sel(number=ensemble_member),
-                v100m=[ds['v100'] for ds in dataset_pf if 'v100' in ds.data_vars][0].sel(number=ensemble_member),
-                sp=[ds['sp']  for ds in dataset_pf if 'sp' in ds.data_vars][0].sel(number=ensemble_member),
-                t2m=[ds['t2m'] for ds in dataset_pf if 't2m' in ds.data_vars][0].sel(number=ensemble_member),
-                msl=[ds['msl'] for ds in dataset_pf if 'msl' in ds.data_vars][0].sel(number=ensemble_member),
-                tcwv=[ds['tcwv'] for ds in dataset_pf if 'tcwv' in ds.data_vars][0].sel(number=ensemble_member),
-                t=[ds['t'] for ds in dataset_pf if 't' in ds.data_vars][0].sel(number=ensemble_member),
-                u=[ds['u'] for ds in dataset_pf if 'u' in ds.data_vars][0].sel(number=ensemble_member),
-                v=[ds['v'] for ds in dataset_pf if 'v' in ds.data_vars][0].sel(number=ensemble_member),
-                r=[ds['r'] for ds in dataset_pf if 'r' in ds.data_vars][0].sel(number=ensemble_member),
-                z=[ds['gh'] for ds in dataset_pf if 'gh' in ds.data_vars][0].sel(number=ensemble_member) * 9.81,
-            )
-            for c in channels
-        ]
-    """
-
     channel_vars = ['sp', 't2m', 'msl', 'tcwv', 't', 'u', 'v', 'r']
 
     if ensemble_member == 0:

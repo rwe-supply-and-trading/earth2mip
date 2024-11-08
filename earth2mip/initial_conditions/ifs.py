@@ -66,6 +66,7 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
     dataset_pf = [ds for ds in dataset_0h if 0 not in ds['number']]
     dataset_cf = [ds for ds in dataset_0h if 0 in ds['number']]
 
+    """
     if ensemble_member == 0:
         channel_data = [
             _get_channel(
@@ -106,6 +107,27 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
             )
             for c in channels
         ]
+    """
+
+    channel_vars = ['u10', 'v10', 'u100', 'v100', 'sp', 't2m', 'msl', 'tcwv', 't', 'u', 'v', 'r']
+
+    if ensemble_member == 0:
+        dset = [ds for ds in dataset_0h if 0 in ds['number']]
+        def _subset(varname):
+            return [ds[varname] for ds in dset if varname in ds.data_vars][0]
+    else:
+        dset = [ds for ds in dataset_0h if 0 not in ds['number']]
+        def _subset(varname):
+            return [ds[varname] for ds in dset if varname in ds.data_vars][0].sel(number=ensemble_member)
+
+    channel_data = [
+        _get_channel(
+            c, 
+            **{var: _subset(var) for var in channel_vars},
+            z=_subset('gh') * 9.81,
+        )   
+        for c in channels
+    ] 
 
     # dataset_0h is list of Datasets, grab first one 
     # for creating new array, variable doesn't matter 

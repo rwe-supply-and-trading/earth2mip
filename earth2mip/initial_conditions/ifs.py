@@ -62,21 +62,20 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
     # open as list of Datasets given structure of grib 
     dataset_0h = cfgrib.open_datasets(path)
 
-    # split control forecast and perturbed forecasts 
-    dataset_pf = [ds for ds in dataset_0h if 0 not in ds['number']]
-    dataset_cf = [ds for ds in dataset_0h if 0 in ds['number']]
-
-    channel_vars = ['sp', 't2m', 'msl', 'tcwv', 't', 'u', 'v', 'r']
-
     if ensemble_member == 0:
+        # control forecast
         dset = [ds for ds in dataset_0h if 0 in ds['number']]
         def _subset(varname):
             return [ds[varname] for ds in dset if varname in ds.data_vars][0]
     else:
+        # perturbed forecasts
         dset = [ds for ds in dataset_0h if 0 not in ds['number']]
         def _subset(varname):
             return [ds[varname] for ds in dset if varname in ds.data_vars][0].sel(number=ensemble_member)
 
+    # channel variables that do not require renaming
+    channel_vars = ['sp', 't2m', 'msl', 'tcwv', 't', 'u', 'v', 'r']
+    
     channel_data = [
         _get_channel(
             c, 

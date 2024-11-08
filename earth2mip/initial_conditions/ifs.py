@@ -19,7 +19,7 @@ import datetime
 import json
 import cfgrib
 from typing import List
-
+import os
 import numpy as np
 import xarray
 from modulus.utils import filesystem
@@ -29,7 +29,7 @@ from earth2mip.datasets.era5 import METADATA
 from earth2mip.initial_conditions import base
 
 
-def _get_filename(time: datetime.datetime, lead_time: str): -> str:
+def _get_filename(time: datetime.datetime, lead_time: str) -> str:
     """
     Returns the IFS forecast grib file containing control and perturbed forecasts
     given the specified datetime and lead time.
@@ -57,7 +57,7 @@ def _get_channel(c: str, **kwargs) -> xarray.DataArray:
 
 
 def get(time: datetime.datetime, channels: List[str], ensemble_member: int, 
-        root_path: str): -> xarray.DataArray:
+        root_path: str) -> xarray.DataArray:
     path = os.path.join(root_path, _get_filename(time, "0h"))
     # open as list of Datasets given structure of grib 
     dataset_0h = cfgrib.open_datasets(path)
@@ -109,7 +109,7 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
         ]
     """
 
-    channel_vars = ['u10', 'v10', 'u100', 'v100', 'sp', 't2m', 'msl', 'tcwv', 't', 'u', 'v', 'r']
+    channel_vars = ['sp', 't2m', 'msl', 'tcwv', 't', 'u', 'v', 'r']
 
     if ensemble_member == 0:
         dset = [ds for ds in dataset_0h if 0 in ds['number']]
@@ -124,6 +124,10 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
         _get_channel(
             c, 
             **{var: _subset(var) for var in channel_vars},
+            u10m=_subset('u10'),
+            v10m=_subset('v10'),
+            u100m=_subset('u100'),
+            v100m=_subset('v100'),
             z=_subset('gh') * 9.81,
         )   
         for c in channels

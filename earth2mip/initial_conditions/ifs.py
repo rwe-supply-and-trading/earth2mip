@@ -76,9 +76,6 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
     # channel variables that do not require renaming
     channel_vars = ['sp', 't2m', 'msl', 'tcwv', 't', 'u', 'v', 'r']
 
-    # add 2d just to test if it works
-    channels.append('d2m')
-
     if hens:
         # add dewpoint temperature 
         channel_vars.append('d2m')

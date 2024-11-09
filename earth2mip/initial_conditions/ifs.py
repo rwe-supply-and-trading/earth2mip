@@ -61,7 +61,7 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
     path = os.path.join(root_path, _get_filename(time, "0h"))
     # open as list of Datasets given structure of grib 
     dataset_0h = cfgrib.open_datasets(path)
-
+    
     if ensemble_member == 0:
         # control forecast
         dset = [ds for ds in dataset_0h if 0 in ds['number']]
@@ -76,8 +76,12 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
     # channel variables that do not require renaming
     channel_vars = ['sp', 't2m', 'msl', 'tcwv', 't', 'u', 'v', 'r']
 
+    # add 2d just to test if it works
+    channels.append('d2m')
+
     if hens:
-        channel_vars = channel_vars.append('2d')
+        # add dewpoint temperature 
+        channel_vars.append('d2m')
     
     channel_data = [
         _get_channel(

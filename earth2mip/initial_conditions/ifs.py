@@ -127,8 +127,9 @@ class DataSource(base.DataSource):
 
     @property
     def hens(self) -> bool:
-        # boolean flag that includes dewpoint temperature (2d) if set to True
-        # note that SFNO version that has dewpoint temperature as input channel must be used
+        # boolean flag that includes dewpoint temperature (d2m) if set to True
+        # IFS DataSource instantiated with hens set to True must be used 
+        # in conjunction with weights and other input files that include a 74th channel
         return self._hens
 
     @property

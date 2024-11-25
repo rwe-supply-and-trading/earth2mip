@@ -100,6 +100,7 @@ class EnsembleRun(pydantic.BaseModel):
         output_path (optional): The path to the output file (alternative to `output_dir`).
         model_registry (optional): The path to the model registry (alternative to the default, $HOME/.cache/earth2mip/models
 	world_size (optional): Number of accelerators being used for the ensemble inference run
+	model_checkpoint (optional): Checkpoint to use if SFNO HENS weights are being used for inference
 	restart_frequency: if provided save at end and at the specified frequency. 0 = only save at end.
         grf_noise_alpha: tuning parameter of the Gaussian random field, see ensemble_utils.generate_noise_grf for details
         grf_noise_sigma: tuning parameter of the Gaussian random field, see ensemble_utils.generate_noise_grf for details
@@ -127,6 +128,7 @@ class EnsembleRun(pydantic.BaseModel):
     output_path: Optional[str] = None
     model_registry: Optional[str] = None
     world_size: Optional[str] = None
+    model_checkpoint: Optional[str] = None
     restart_frequency: Optional[int] = None
     grf_noise_alpha: float = 2.0
     grf_noise_sigma: float = 5.0

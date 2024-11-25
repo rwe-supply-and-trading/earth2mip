@@ -102,7 +102,7 @@ class EnsembleRun(pydantic.BaseModel):
 	world_size (optional): Number of accelerators being used for the ensemble inference run
 	model_checkpoint (optional): Checkpoint to use if SFNO HENS weights are being used for inference
 	ic_path (optional): If specified, load initial conditions from this path. Only valid currently for EC IFS. 
-	ensemble_member (optional): If specified, load initial conditions for the ensemble member number provided. Only valid for IFS. 0 indicates the control run. 
+	ensemble_member (optional): Specifies the IFS ensemble member number, only valid for IFS. 0 indicates the control run. 
 	restart_frequency: if provided save at end and at the specified frequency. 0 = only save at end.
         grf_noise_alpha: tuning parameter of the Gaussian random field, see ensemble_utils.generate_noise_grf for details
         grf_noise_sigma: tuning parameter of the Gaussian random field, see ensemble_utils.generate_noise_grf for details

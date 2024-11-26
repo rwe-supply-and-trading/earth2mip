@@ -98,7 +98,7 @@ class EnsembleRun(pydantic.BaseModel):
         weather_event (optional): The weather event to use for the forecast (alternative to `forecast_name`).
         output_dir (optional): The directory to save the output files in (alternative to `output_path`).
         output_path (optional): The path to the output file (alternative to `output_dir`).
-        model_registry (optional): The path to the model registry (alternative to the default, $HOME/.cache/earth2mip/models
+        model_registry (optional): The path to the model registry (alternative to the default, $HOME/.cache/earth2mip/models)
 	world_size (optional): Number of accelerators being used for the ensemble inference run
 	model_checkpoint (optional): Checkpoint to use if SFNO HENS weights are being used for inference
 	ic_path (optional): If specified, load initial conditions from this path. Only valid currently for EC IFS. 

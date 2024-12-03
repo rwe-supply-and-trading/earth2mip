@@ -80,23 +80,38 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
         # add dewpoint temperature 
         #channel_vars.append('d2m')
     
-    channel_data = [
-        _get_channel(
-            c, 
-            **{var: _subset(var) for var in channel_vars},
-            u10m=_subset('u10'),
-            v10m=_subset('v10'),
-            u100m=_subset('u100'),
-            v100m=_subset('v100'),
-            z=_subset('gh') * 9.81,
-        )   
-        for c in channels
-    ]
-
     if hens:
+        channel_data = [
+            _get_channel(
+                c, 
+                **{var: _subset(var) for var in channel_vars},
+                u10m=_subset('u10'),
+                v10m=_subset('v10'),
+                u100m=_subset('u100'),
+                v100m=_subset('v100'),
+                2d=_subset('d2m'),
+                z=_subset('gh') * 9.81,
+            )   
+            for c in channels
+        ]
+    else:
+        channel_data = [
+            _get_channel(
+                c,
+                **{var: _subset(var) for var in channel_vars},
+                u10m=_subset('u10'),
+                v10m=_subset('v10'),
+                u100m=_subset('u100'),
+                z=_subset('gh') * 9.81,
+            ) 
+            for c in channels
+        ]
+
+
+    #if hens:
         # add dewpoint temperature 
         # needs to be renamed to 2d to match hens weights
-        channel_data.append(2d=_subset('d2m'))
+        # channel_data.append(2d=_subset('d2m'))
 
     # dataset_0h is list of Datasets, grab first one 
     # for creating new array, variable doesn't matter 

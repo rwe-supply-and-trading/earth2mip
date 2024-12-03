@@ -89,7 +89,8 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
                 v10m=_subset('v10'),
                 u100m=_subset('u100'),
                 v100m=_subset('v100'),
-                2d=_subset('d2m'),
+                d2m=_subset('d2m'),
+                q=_subset('q'),
                 z=_subset('gh') * 9.81,
             )   
             for c in channels
@@ -106,7 +107,6 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
             ) 
             for c in channels
         ]
-
 
     #if hens:
         # add dewpoint temperature 

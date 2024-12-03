@@ -76,9 +76,9 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
     # channel variables that do not require renaming
     channel_vars = ['sp', 't2m', 'msl', 'tcwv', 't', 'u', 'v', 'r']
 
-    if hens:
+    #if hens:
         # add dewpoint temperature 
-        channel_vars.append('d2m')
+        #channel_vars.append('d2m')
     
     channel_data = [
         _get_channel(
@@ -91,7 +91,12 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
             z=_subset('gh') * 9.81,
         )   
         for c in channels
-    ] 
+    ]
+
+    if hens:
+        # add dewpoint temperature 
+        # needs to be renamed to 2d to match hens weights
+        channel_data.append(2d=_subset('d2m'))
 
     # dataset_0h is list of Datasets, grab first one 
     # for creating new array, variable doesn't matter 

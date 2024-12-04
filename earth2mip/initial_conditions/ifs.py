@@ -76,42 +76,27 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
     # channel variables that do not require renaming
     channel_vars = ['sp', 't2m', 'msl', 'tcwv', 't', 'u', 'v', 'r']
 
-    #if hens:
-        # add dewpoint temperature 
-        #channel_vars.append('d2m')
-    
     if hens:
-        channel_data = [
-            _get_channel(
-                c, 
-                **{var: _subset(var) for var in channel_vars},
-                u10m=_subset('u10'),
-                v10m=_subset('v10'),
-                u100m=_subset('u100'),
-                v100m=_subset('v100'),
-                d2m=_subset('d2m'),
-                q=_subset('q'),
-                z=_subset('gh') * 9.81,
-            )   
-            for c in channels
-        ]
-    else:
-        channel_data = [
-            _get_channel(
-                c,
-                **{var: _subset(var) for var in channel_vars},
-                u10m=_subset('u10'),
-                v10m=_subset('v10'),
-                u100m=_subset('u100'),
-                z=_subset('gh') * 9.81,
-            ) 
-            for c in channels
-        ]
-
-    #if hens:
         # add dewpoint temperature 
-        # needs to be renamed to 2d to match hens weights
-        # channel_data.append(2d=_subset('d2m'))
+        # note that dewpoint temperature is actually called 
+        # `2d` in HENS, which can be handled in running ensemble inference by 
+        # renaming the corresponding channel names attribute on an inference object 
+        channel_vars.append('d2m')
+
+        # also add humidity 
+        channel_vars.append('q')
+    
+    channel_data = [
+        _get_channel(
+            c,
+            **{var: _subset(var) for var in channel_vars},
+            u10m=_subset('u10'),
+            v10m=_subset('v10'),
+            u100m=_subset('u100'),
+            z=_subset('gh') * 9.81,
+        ) 
+        for c in channels
+    ]
 
     # dataset_0h is list of Datasets, grab first one 
     # for creating new array, variable doesn't matter 

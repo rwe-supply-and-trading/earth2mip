@@ -93,6 +93,7 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
             u10m=_subset('u10'),
             v10m=_subset('v10'),
             u100m=_subset('u100'),
+            v100m=_subset('v100'),
             z=_subset('gh') * 9.81,
         ) 
         for c in channels

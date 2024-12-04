@@ -78,20 +78,26 @@ def get(time: datetime.datetime, channels: List[str], ensemble_member: int,
 
     if hens:
         # add dewpoint temperature 
+        # note that dewpoint temperature is actually called 
+        # `2d` in HENS, which can be handled in running ensemble inference by 
+        # renaming the corresponding channel names attribute on an inference object 
         channel_vars.append('d2m')
+
+        # also add humidity 
+        channel_vars.append('q')
     
     channel_data = [
         _get_channel(
-            c, 
+            c,
             **{var: _subset(var) for var in channel_vars},
             u10m=_subset('u10'),
             v10m=_subset('v10'),
             u100m=_subset('u100'),
             v100m=_subset('v100'),
             z=_subset('gh') * 9.81,
-        )   
+        ) 
         for c in channels
-    ] 
+    ]
 
     # dataset_0h is list of Datasets, grab first one 
     # for creating new array, variable doesn't matter 

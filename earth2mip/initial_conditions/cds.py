@@ -108,6 +108,7 @@ class DataSource:
         default_factory=lambda: Client(progress=False, quiet=False)
     )
     _cache: Optional[str] = None
+    hens: bool = False # if True, do not store files in a hash directory
 
     @property
     def time_means(self):
@@ -126,7 +127,7 @@ class DataSource:
 
     def __getitem__(self, time: datetime.datetime):
         os.makedirs(self.cache, exist_ok=True)
-        return _get_channels(self.client, time, self.channel_names, self.cache).values
+        return _get_channels(self.client, time, self.channel_names, self.cache, self.hens).values
 
 
 def _get_cds_requests(codes, time, format):
@@ -226,14 +227,18 @@ def _parse_files(
     return xarray.DataArray(array, dims=["channel", "lat", "lon"], coords=coords)
 
 
-def _download_codes(client, codes, time, d) -> xarray.DataArray:
+def _download_codes(client, codes, time, d, hens=True) -> xarray.DataArray:
     files = []
     format = "grib"
 
     def download(arg):
         name, req = arg
         hash_ = hashlib.sha256(str(req).encode()).hexdigest()
-        dirname = os.path.join(d, hash_)
+        if hens:
+            # don't want files to be stored in a hash directory 
+            dirname = d
+        else: 
+            dirname = os.path.join(d, hash_)
         os.makedirs(dirname, exist_ok=True)
         filename = name + ".grib"
         path = os.path.join(dirname, filename)
@@ -252,9 +257,9 @@ def _download_codes(client, codes, time, d) -> xarray.DataArray:
     return _parse_files(codes, files)
 
 
-def _get_channels(client, time: datetime.datetime, channels: List[str], d):
+def _get_channels(client, time: datetime.datetime, channels: List[str], d, hens):
     codes = [parse_channel(c) for c in channels]
-    darray = _download_codes(client, codes, time, d)
+    darray = _download_codes(client, codes, time, d, hens)
     return (
         darray.assign_coords(channel=channels)
         .assign_coords(time=time)

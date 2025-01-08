@@ -257,9 +257,9 @@ def _download_codes(client, codes, time, d, hash_in_path=True) -> xarray.DataArr
     return _parse_files(codes, files)
 
 
-def _get_channels(client, time: datetime.datetime, channels: List[str], d, hens):
+def _get_channels(client, time: datetime.datetime, channels: List[str], d, hash_in_path):
     codes = [parse_channel(c) for c in channels]
-    darray = _download_codes(client, codes, time, d, hens)
+    darray = _download_codes(client, codes, time, d, hash_in_path)
     return (
         darray.assign_coords(channel=channels)
         .assign_coords(time=time)

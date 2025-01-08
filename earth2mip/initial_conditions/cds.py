@@ -108,7 +108,7 @@ class DataSource:
         default_factory=lambda: Client(progress=False, quiet=False)
     )
     _cache: Optional[str] = None
-    hens: bool = False # if True, do not store files in a hash directory
+    hash_in_path: bool = True # if False, do not store files in a hash directory
 
     @property
     def time_means(self):
@@ -127,7 +127,7 @@ class DataSource:
 
     def __getitem__(self, time: datetime.datetime):
         os.makedirs(self.cache, exist_ok=True)
-        return _get_channels(self.client, time, self.channel_names, self.cache, self.hens).values
+        return _get_channels(self.client, time, self.channel_names, self.cache, self.hash_in_path).values
 
 
 def _get_cds_requests(codes, time, format):
@@ -227,18 +227,18 @@ def _parse_files(
     return xarray.DataArray(array, dims=["channel", "lat", "lon"], coords=coords)
 
 
-def _download_codes(client, codes, time, d, hens=True) -> xarray.DataArray:
+def _download_codes(client, codes, time, d, hash_in_path=True) -> xarray.DataArray:
     files = []
     format = "grib"
 
     def download(arg):
         name, req = arg
         hash_ = hashlib.sha256(str(req).encode()).hexdigest()
-        if hens:
-            # don't want files to be stored in a hash directory 
-            dirname = d
-        else: 
-            dirname = os.path.join(d, hash_)
+        if hash_in_path:
+	    dirname = os.path.join(d, hash_)
+	else: 
+	    # don't want files to be stored in a hash directory
+	    dirname = d
         os.makedirs(dirname, exist_ok=True)
         filename = name + ".grib"
         path = os.path.join(dirname, filename)

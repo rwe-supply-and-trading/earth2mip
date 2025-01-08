@@ -227,7 +227,7 @@ def _parse_files(
     return xarray.DataArray(array, dims=["channel", "lat", "lon"], coords=coords)
 
 
-def _download_codes(client, codes, time, d, hash_in_path=True) -> xarray.DataArray:
+def _download_codes(client, codes, time, d, hash_in_path) -> xarray.DataArray:
     files = []
     format = "grib"
 

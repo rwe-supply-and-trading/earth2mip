@@ -235,10 +235,10 @@ def _download_codes(client, codes, time, d, hash_in_path) -> xarray.DataArray:
         name, req = arg
         hash_ = hashlib.sha256(str(req).encode()).hexdigest()
         if hash_in_path:
-	    dirname = os.path.join(d, hash_)
-	else: 
-	    # don't want files to be stored in a hash directory
-	    dirname = d
+            dirname = os.path.join(d, hash_)
+        else: 
+            # don't want files to be stored in a hash directory
+            dirname = d
         os.makedirs(dirname, exist_ok=True)
         filename = name + ".grib"
         path = os.path.join(dirname, filename)
